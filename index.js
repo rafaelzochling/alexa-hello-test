@@ -1,6 +1,7 @@
 const Alexa = require('ask-sdk-core');
 const getRickInfo = require('./src/requests/rick');
 const getCharacterInfo = require('./src/requests/getCharacterInfo');
+const getRandomInfo = require('./src/requests/getRandomInfo');
 
 const LaunchRequestHandler = {
     canHandle(handlerInput) {
@@ -39,6 +40,20 @@ const CharacterInformationIntentHandler = {
         handlerInput.attributesManager.getRequestAttributes();
         const { value: characterName } = handlerInput.requestEnvelope.request.intent.slots.characterName;
         const  speechText = await getCharacterInfo(characterName);
+        return handlerInput.responseBuilder
+            .speak(speechText)
+            .withSimpleCard('Hello Multiverse', speechText)
+            .getResponse();
+    }
+};
+
+const RandomCharacterIntentHandler = {
+    canHandle(handlerInput) {
+        return handlerInput.requestEnvelope.request.type === 'IntentRequest'
+            && handlerInput.requestEnvelope.request.intent.name === 'RandomCharacterIntent';
+    },
+    async handle(handlerInput) {
+        const  speechText = await getRandomInfo();
         return handlerInput.responseBuilder
             .speak(speechText)
             .withSimpleCard('Hello Multiverse', speechText)
@@ -103,6 +118,7 @@ exports.handler = Alexa.SkillBuilders.custom()
      .addRequestHandlers(LaunchRequestHandler,
                          HelloMultiverseIntentHandler,
                          CharacterInformationIntentHandler,
+                         RandomCharacterIntentHandler,
                          HelpIntentHandler,
                          CancelAndStopIntentHandler,
                          SessionEndedRequestHandler)
