@@ -1,4 +1,5 @@
 const Alexa = require('ask-sdk-core');
+const getRickInfo = require('./src/requests/rick');
 
 const LaunchRequestHandler = {
     canHandle(handlerInput) {
@@ -17,10 +18,10 @@ const LaunchRequestHandler = {
 const HelloMultiverseIntentHandler = {
     canHandle(handlerInput) {
         return handlerInput.requestEnvelope.request.type === 'IntentRequest'
-            && handlerInput.requestEnvelope.request.intent.name === 'HelloMultiverseIntent';
+            && handlerInput.requestEnvelope.request.intent.name === 'HelloMultiverseIntentHandler';
     },
-    handle(handlerInput) {
-        const speechText = 'Hello Multiverse!';
+    async handle(handlerInput) {
+        const  speechText = await getRickInfo();
         return handlerInput.responseBuilder
             .speak(speechText)
             .withSimpleCard('Hello Multiverse', speechText)
@@ -63,7 +64,7 @@ const SessionEndedRequestHandler = {
         return handlerInput.requestEnvelope.request.type === 'SessionEndedRequest';
     },
     handle(handlerInput) {
-        // Cleanup space reserved
+        console.log('Code passed on here');
         return handlerInput.responseBuilder.getResponse();
     }
 };
