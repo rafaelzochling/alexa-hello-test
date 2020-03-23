@@ -1,5 +1,6 @@
 const Alexa = require('ask-sdk-core');
 const getRickInfo = require('./src/requests/rick');
+const getCharacterInfo = require('./src/requests/getCharacterInfo');
 
 const LaunchRequestHandler = {
     canHandle(handlerInput) {
@@ -22,6 +23,22 @@ const HelloMultiverseIntentHandler = {
     },
     async handle(handlerInput) {
         const  speechText = await getRickInfo();
+        return handlerInput.responseBuilder
+            .speak(speechText)
+            .withSimpleCard('Hello Multiverse', speechText)
+            .getResponse();
+    }
+};
+
+const CharacterInformationIntentHandler = {
+    canHandle(handlerInput) {
+        return handlerInput.requestEnvelope.request.type === 'IntentRequest'
+            && handlerInput.requestEnvelope.request.intent.name === 'CharacterInformationIntent';
+    },
+    async handle(handlerInput) {
+        handlerInput.attributesManager.getRequestAttributes();
+        const { value: characterName } = handlerInput.requestEnvelope.request.intent.slots.characterName;
+        const  speechText = await getCharacterInfo(characterName);
         return handlerInput.responseBuilder
             .speak(speechText)
             .withSimpleCard('Hello Multiverse', speechText)
@@ -85,6 +102,7 @@ const ErrorHandler = {
 exports.handler = Alexa.SkillBuilders.custom()
      .addRequestHandlers(LaunchRequestHandler,
                          HelloMultiverseIntentHandler,
+                         CharacterInformationIntentHandler,
                          HelpIntentHandler,
                          CancelAndStopIntentHandler,
                          SessionEndedRequestHandler)
